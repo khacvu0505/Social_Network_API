@@ -6,7 +6,7 @@ import {
 import { loginValidator } from "~/middlewares/users.middlewares";
 const userRouter = express.Router();
 
-userRouter.get("/login", loginValidator, loginController);
+userRouter.post("/login", loginValidator, loginController);
 
 userRouter.post("/register", registerController);
 
