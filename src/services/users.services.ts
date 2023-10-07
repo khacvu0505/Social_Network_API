@@ -1,27 +1,27 @@
-import { TokenType } from "~/constants/enum";
-import { RegisterRequestBody } from "~/models/requests/User.requests";
-import User from "~/models/schemas/User.schema";
-import databaseService from "~/services/database.services";
-import { hasPassword } from "~/utils/crypto";
-import { signToken } from "~/utils/jwt";
+import { TokenType } from '~/constants/enum';
+import { RegisterRequestBody } from '~/models/requests/User.requests';
+import User from '~/models/schemas/User.schema';
+import databaseService from '~/services/database.services';
+import { hasPassword } from '~/utils/crypto';
+import { signToken } from '~/utils/jwt';
 
 class UsersService {
   private signAccessToken(user_id: string) {
     return signToken({
       payload: { user_id, token_type: TokenType.AccessToken },
       options: {
-        algorithm: "HS256",
-        expiresIn: "15m",
-      },
+        algorithm: 'HS256',
+        expiresIn: '15m'
+      }
     });
   }
   private signRefreshToken(user_id: string) {
     return signToken({
       payload: { user_id, token_type: TokenType.RefreshToken },
       options: {
-        algorithm: "HS256",
-        expiresIn: "7d",
-      },
+        algorithm: 'HS256',
+        expiresIn: '7d'
+      }
     });
   }
   async register(payload: RegisterRequestBody) {
@@ -29,13 +29,13 @@ class UsersService {
       new User({
         ...payload,
         date_of_birth: new Date(payload.date_of_birth),
-        password: hasPassword(payload.password),
+        password: hasPassword(payload.password)
       })
     );
     const userId = result.insertedId.toString();
     const [accessToken, refreshToken] = await Promise.all([
       this.signAccessToken(userId),
-      this.signRefreshToken(userId),
+      this.signRefreshToken(userId)
     ]);
 
     return { accessToken, refreshToken };

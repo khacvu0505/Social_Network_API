@@ -1,14 +1,14 @@
-import { Collection, Db, MongoClient } from "mongodb";
-import dotenv from "dotenv";
-import User from "~/models/schemas/User.schema";
+import { Collection, Db, MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
+import User from '~/models/schemas/User.schema';
 
 dotenv.config();
 // dotenv.config({ path: "./config.env" });
 
-const uri = process.env.DB_URI?.replace(
-  "<username>",
-  process.env.DB_USERNAME as string
-).replace("<password>", process.env.DB_PASSWORD as string);
+const uri = process.env.DB_URI?.replace('<username>', process.env.DB_USERNAME as string).replace(
+  '<password>',
+  process.env.DB_PASSWORD as string
+);
 
 class DatabaseService {
   private client: MongoClient;
@@ -21,9 +21,7 @@ class DatabaseService {
     try {
       // Send a ping to confirm a successful connection
       await this.db.command({ ping: 1 });
-      console.log(
-        "Pinged your deployment. You successfully connected to MongoDB!"
-      );
+      console.log('Pinged your deployment. You successfully connected to MongoDB!');
     } catch (error) {
       // Ensures that the client will close when you finish/error
       await this.client.close();
