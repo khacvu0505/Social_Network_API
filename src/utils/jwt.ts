@@ -1,4 +1,8 @@
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import { TokenPayload } from '~/models/requests/User.requests';
+
+dotenv.config();
 
 export const signToken = ({
   payload,
@@ -19,4 +23,16 @@ export const signToken = ({
       resolve(token as string);
     });
   });
+};
+
+export const verifyToken = ({
+  token,
+  secretKey = process.env.JWT_SECRET
+}: {
+  token: string;
+  secretKey?: string;
+}): TokenPayload => {
+  const decoded = jwt.verify(token, secretKey as string) as TokenPayload;
+
+  return decoded;
 };
