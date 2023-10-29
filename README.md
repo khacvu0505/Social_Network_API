@@ -1,11 +1,11 @@
 # Twitter API
 
-# Learn NodeJS with MongoDB
+## Learn NodeJS with MongoDB
 
-# Authentication: JWT
+### Authentication: JWT
 
-# The functions related to users:
+### Users:
 
-<!-- Send email to verify account when register successfully -->
-<!-- Forgot Password -->
-<!-- Reset password -->
+- Send email to verify account when register successfully
+- Forgot Password
+- Reset password

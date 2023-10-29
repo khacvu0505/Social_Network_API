@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ParamSchema, checkSchema } from 'express-validator';
 import { USERS_MESSAGES } from '~/constants/messages';
 import databaseService from '~/services/database.services';
@@ -11,6 +11,8 @@ import { ErrorWithStatus } from '~/models/Error';
 import HTTP_STATUS from '~/constants/httpStatus';
 import capitalize from 'lodash/capitalize';
 import { ObjectId } from 'mongodb';
+import { TokenPayload } from '~/models/requests/User.requests';
+import { UserVerifyStatus } from '~/constants/enum';
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -381,3 +383,17 @@ export const resetPasswordValidator = validate(
     ['body']
   )
 );
+
+// Verify base on authorization_decoded
+export const verifyUserValidation = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decoded_authorization as TokenPayload;
+  if (verify !== UserVerifyStatus.Verified) {
+    return next(
+      new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_VERIFY,
+        status: HTTP_STATUS.FORBIDDEN
+      })
+    );
+  }
+  return next();
+};

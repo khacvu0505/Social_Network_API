@@ -7,7 +7,9 @@ import {
   forgotPasswordController,
   verifyForgotPasswordController,
   resetPasswordController,
-  verifyEmailTokenController
+  verifyEmailTokenController,
+  getMeController,
+  updateMeController
 } from '~/controllers/users.controllers';
 import {
   accessTokenValidator,
@@ -17,7 +19,8 @@ import {
   registerValidator,
   resetPasswordValidator,
   verifyEmailTokenValidator,
-  verifyForgotPasswordTokenValidator
+  verifyForgotPasswordTokenValidator,
+  verifyUserValidation
 } from '~/middlewares/users.middlewares';
 import { wrapRequestHandler } from '~/utils/handlers';
 const userRouter = express.Router();
@@ -99,5 +102,24 @@ userRouter.post(
   Body:{ forgot_password_token:string, password: string, confirm_password: string }
  */
 userRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController));
+
+/**
+ * 
+  Description: Get me profile
+  Path:/me
+  Method: GET
+  Header: Beearer <access_token>
+ */
+userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController));
+
+/**
+ * 
+  Description: Update me profile
+  Path:/me
+  Method: PATCH
+  Header: Beearer <access_token>
+  Body: UserSchema
+ */
+userRouter.patch('/me', accessTokenValidator, verifyUserValidation, wrapRequestHandler(updateMeController));
 
 export default userRouter;
