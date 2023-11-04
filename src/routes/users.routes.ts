@@ -9,19 +9,25 @@ import {
   resetPasswordController,
   verifyEmailTokenController,
   getMeController,
-  updateMeController
+  updateMeController,
+  getProfileController,
+  followController
 } from '~/controllers/users.controllers';
+import { filterMiddleware } from '~/middlewares/common.middlewares';
 import {
   accessTokenValidator,
+  followValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
+  updateMeValidator,
   verifyEmailTokenValidator,
   verifyForgotPasswordTokenValidator,
-  verifyUserValidation
+  verifyUserValidator
 } from '~/middlewares/users.middlewares';
+import { UpdateMeRequestBody } from '~/models/requests/User.requests';
 import { wrapRequestHandler } from '~/utils/handlers';
 const userRouter = express.Router();
 
@@ -117,9 +123,50 @@ userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
   Description: Update me profile
   Path:/me
   Method: PATCH
-  Header: Beearer <access_token>
+  Header: Bearer <access_token>
   Body: UserSchema
  */
-userRouter.patch('/me', accessTokenValidator, verifyUserValidation, wrapRequestHandler(updateMeController));
+userRouter.patch(
+  '/me',
+  accessTokenValidator,
+  verifyUserValidator,
+  updateMeValidator,
+  // This is middleware to get correct params from body
+  filterMiddleware<UpdateMeRequestBody>([
+    'avatar',
+    'bio',
+    'cover_photo',
+    'date_of_birth',
+    'location',
+    'name',
+    'username',
+    'website'
+  ]),
+  wrapRequestHandler(updateMeController)
+);
+
+/**
+ * 
+  Description: Get user profile
+  Path:/:username
+  Method: GET
+ */
+userRouter.get('/:username', wrapRequestHandler(getProfileController));
+
+/**
+ * 
+  Description: Follow someone
+  Path:/follow
+  Method: POST
+  Header: Bearer <access_token>
+  Body: {user_id: string}
+ */
+userRouter.post(
+  '/follow',
+  accessTokenValidator,
+  verifyUserValidator,
+  followValidator,
+  wrapRequestHandler(followController)
+);
 
 export default userRouter;

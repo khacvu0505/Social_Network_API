@@ -39,5 +39,20 @@ export const USERS_MESSAGES = {
   FORGOT_PASSWORD_TOKEN_IS_INVALID: 'Forgot password token is invalid',
   RESET_PASSWORD_SUCCESS: 'Reset password successfully',
   GET_ME_SUCCESS: 'Get me successfully',
-  USER_NOT_VERIFY: 'User not verify'
+  USER_NOT_VERIFY: 'User not verify',
+  BIO_MUST_BE_A_STRING: 'Bio must be a string',
+  BIO_LENGTH: 'Bio length must be from 1 to 200',
+  LOCATION_MUST_BE_A_STRING: 'Location must be a string',
+  LOCATION_LENGTH: 'Location length must be from 1 to 200',
+  WEBSITE_MUST_BE_A_STRING: 'Website must be a string',
+  WEBSITE__LENGTH: 'Website length must be from 1 to 400',
+  USER_NAME_MUST_BE_A_STRING: 'User name must be a string',
+  USER_NAME_LENGTH: 'User name length must be from 1 to 50',
+  IMAGE_URL_MUST_BE_A_STRING: 'Image url must be a string',
+  IMAGE_URL_LENGTH: 'Image url length must be from 1 to 400',
+  UPDATE_ME_SUCCESS: 'Update me successfully',
+  GET_PROFILE_SUCCESS: 'Get profile successfully',
+  FOLLOW_SUCCESS: 'Follow successfully',
+  INVALID_FOLLOWED_USER_ID: 'Invalid followed user id',
+  FOLLOWED: 'User was followed'
 } as const;

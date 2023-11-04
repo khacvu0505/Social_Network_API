@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { TokenType, UserVerifyStatus } from '~/constants/enum';
 import { USERS_MESSAGES } from '~/constants/messages';
-import { RegisterRequestBody } from '~/models/requests/User.requests';
+import { RegisterRequestBody, UpdateMeRequestBody } from '~/models/requests/User.requests';
+import Follower from '~/models/schemas/Follower.schema';
 import RefreshToken from '~/models/schemas/RefreshToken.schema';
 import User from '~/models/schemas/User.schema';
 import databaseService from '~/services/database.services';
@@ -69,6 +70,7 @@ class UsersService {
       new User({
         ...payload,
         _id: user_id,
+        username: `user${user_id}`,
         email_verify_token,
         date_of_birth: new Date(payload.date_of_birth),
         password: hasPassword(payload.password)
@@ -219,6 +221,73 @@ class UsersService {
       }
     );
     return user;
+  }
+
+  async updateMe(user_id: string, payload: UpdateMeRequestBody) {
+    const _payload = payload.date_of_birth
+      ? { ...payload, date_of_birth: new Date(payload.date_of_birth) }
+      : (payload as UpdateMeRequestBody & { date_of_birth?: Date });
+
+    // Chỗ này có 2 methods: updateOne and findOneAndUpdate
+    // + updateOne: Chỉ update data
+    // + findOneAndUpdate: update data xong thì trả về document luôn
+    const user = await databaseService.users.findOneAndUpdate(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          ..._payload
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 }
+      }
+    );
+    return user.value;
+  }
+
+  async getProfile(username: string) {
+    const user = await databaseService.users.findOne(
+      { username },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0,
+          createdAt: 0,
+          updatedAt: 0
+        }
+      }
+    );
+    return user;
+  }
+
+  async follow(user_id: string, followed_user_id: string) {
+    const isUserFollowed = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    });
+    if (isUserFollowed) {
+      return {
+        message: USERS_MESSAGES.FOLLOWED
+      };
+    }
+
+    await databaseService.followers.insertOne(
+      new Follower({
+        followed_user_id: new ObjectId(followed_user_id),
+        user_id: new ObjectId(user_id)
+      })
+    );
+    return {
+      message: USERS_MESSAGES.FOLLOW_SUCCESS
+    };
   }
 }
 
