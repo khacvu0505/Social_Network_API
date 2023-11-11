@@ -6,6 +6,7 @@ import HTTP_STATUS from '~/constants/httpStatus';
 import { USERS_MESSAGES } from '~/constants/messages';
 import { ErrorWithStatus } from '~/models/Error';
 import {
+  ChangePasswordRequestBody,
   FollowRequestBody,
   ForgotPasswordRequestBody,
   GetProfileRequestParams,
@@ -14,6 +15,7 @@ import {
   RegisterRequestBody,
   ResetPasswordRequestBody,
   TokenPayload,
+  UnFollowRequestParams,
   UpdateMeRequestBody,
   VerifyEmailRequestBody,
   VerifyForgotPasswordRequestBody
@@ -164,4 +166,29 @@ export const followController = async (req: Request<ParamsDictionary, any, Follo
   const result = await usersService.follow(user_id, followed_user_id);
 
   return res.status(HTTP_STATUS.OK).json(result);
+};
+
+export const unFollowController = async (req: Request<UnFollowRequestParams>, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload;
+
+  const { user_id: followed_user_id } = req.params;
+
+  const result = await usersService.unFollow(user_id, followed_user_id);
+
+  return res.status(HTTP_STATUS.OK).json(result);
+};
+
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, any, ChangePasswordRequestBody>,
+  res: Response
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload;
+  const dataUpdate = req.body;
+
+  const result = await usersService.changePassword(user_id, dataUpdate);
+
+  return res.status(HTTP_STATUS.OK).json({
+    message: USERS_MESSAGES.CHANGE_PASSWORD_SUCCESS,
+    result
+  });
 };
