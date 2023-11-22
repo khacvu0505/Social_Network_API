@@ -55,5 +55,13 @@ export const USERS_MESSAGES = {
   FOLLOW_SUCCESS: 'Follow successfully',
   INVALID_FOLLOWED_USER_ID: 'Invalid followed user id',
   FOLLOWED: 'User was followed',
-  GMAIL_NOT_VERIFIED: 'Gmail not verified'
+  GMAIL_NOT_VERIFIED: 'Gmail not verified',
+  INVALID_USER_ID: 'Invalid user id',
+  FOLLOW_NOT_YET: 'User not yet followed',
+  UNFOLLOW_SUCCESS: 'Unfollow successfully',
+  USER_NAME_INVALID:
+    'User name must 4-15 characters long and contain only letters, numbers, underscores and periods, not only number',
+  USER_NAME_ALREADY_EXISTS: 'User name already exists',
+  OLD_PASSWORD_INCORRECT: 'Old password incorrect',
+  CHANGE_PASSWORD_SUCCESS: 'Change password successfully'
 } as const;

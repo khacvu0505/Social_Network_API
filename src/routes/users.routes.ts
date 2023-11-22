@@ -12,17 +12,21 @@ import {
   updateMeController,
   getProfileController,
   followController,
-  OAuthController
+  OAuthController,
+  unFollowController,
+  changePasswordController
 } from '~/controllers/users.controllers';
 import { filterMiddleware } from '~/middlewares/common.middlewares';
 import {
   accessTokenValidator,
+  changePasswordValidator,
   followValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
+  unFollowValidator,
   updateMeValidator,
   verifyEmailTokenValidator,
   verifyForgotPasswordTokenValidator,
@@ -176,6 +180,36 @@ userRouter.post(
   verifyUserValidator,
   followValidator,
   wrapRequestHandler(followController)
+);
+
+/**
+ * 
+  Description: UnFollow someone
+  Path:/follow/user_id
+  Method: DELLETE
+  Header: Bearer <access_token>
+ */
+userRouter.delete(
+  '/unfollow/:user_id',
+  accessTokenValidator,
+  verifyUserValidator,
+  unFollowValidator,
+  wrapRequestHandler(unFollowController)
+);
+
+/**
+ * 
+  Description: Change Password
+  Path:/change-password
+  Method: put
+  Header: Bearer <access_token>
+ */
+userRouter.put(
+  '/change-password',
+  accessTokenValidator,
+  verifyUserValidator,
+  changePasswordValidator,
+  wrapRequestHandler(changePasswordController)
 );
 
 export default userRouter;

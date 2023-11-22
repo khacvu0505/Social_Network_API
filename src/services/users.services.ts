@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { TokenType, UserVerifyStatus } from '~/constants/enum';
 import { USERS_MESSAGES } from '~/constants/messages';
-import { RegisterRequestBody, UpdateMeRequestBody } from '~/models/requests/User.requests';
+import { ChangePasswordRequestBody, RegisterRequestBody, UpdateMeRequestBody } from '~/models/requests/User.requests';
 import Follower from '~/models/schemas/Follower.schema';
 import RefreshToken from '~/models/schemas/RefreshToken.schema';
 import User from '~/models/schemas/User.schema';
@@ -378,6 +378,45 @@ class UsersService {
     return {
       message: USERS_MESSAGES.FOLLOW_SUCCESS
     };
+  }
+
+  async unFollow(user_id: string, followed_user_id: string) {
+    const isUserFollowed = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    });
+    if (!isUserFollowed) {
+      return {
+        message: USERS_MESSAGES.FOLLOW_NOT_YET
+      };
+    }
+
+    await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    });
+    return {
+      message: USERS_MESSAGES.UNFOLLOW_SUCCESS
+    };
+  }
+
+  async changePassword(user_id: string, payload: ChangePasswordRequestBody) {
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          password: hasPassword(payload.password)
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 }
+      }
+    );
+    return user.value;
   }
 }
 

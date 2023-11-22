@@ -13,6 +13,7 @@ import capitalize from 'lodash/capitalize';
 import { ObjectId } from 'mongodb';
 import { TokenPayload } from '~/models/requests/User.requests';
 import { UserVerifyStatus } from '~/constants/enum';
+import { REGEX_USERNAME } from '~/constants/regex';
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -145,6 +146,26 @@ const imageSchema: ParamSchema = {
   isLength: { options: { min: 1, max: 400 }, errorMessage: USERS_MESSAGES.IMAGE_URL_LENGTH }
 };
 
+const userIdSchema: ParamSchema = {
+  custom: {
+    options: async (value, { req }) => {
+      if (!ObjectId.isValid(value)) {
+        throw new ErrorWithStatus({
+          message: USERS_MESSAGES.INVALID_USER_ID,
+          status: HTTP_STATUS.BAD_REQUEST
+        });
+      }
+      const user_id = await databaseService.users.findOne({ _id: new ObjectId(value) });
+      if (!user_id) {
+        throw new ErrorWithStatus({
+          message: USERS_MESSAGES.USER_NOT_FOUND,
+          status: HTTP_STATUS.NOT_FOUND
+        });
+      }
+      return true;
+    }
+  }
+};
 // ==================== Validators ====================
 
 export const loginValidator = validate(
@@ -458,8 +479,26 @@ export const updateMeValidator = validate(
         isString: {
           errorMessage: USERS_MESSAGES.USER_NAME_MUST_BE_A_STRING
         },
-        trim: true,
-        isLength: { options: { min: 1, max: 50 }, errorMessage: USERS_MESSAGES.USER_NAME_LENGTH }
+        isLength: { options: { min: 1, max: 50 }, errorMessage: USERS_MESSAGES.USER_NAME_LENGTH },
+        custom: {
+          options: async (value, { req }) => {
+            if (!REGEX_USERNAME.test(value)) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.USER_NAME_INVALID,
+                status: HTTP_STATUS.BAD_REQUEST
+              });
+            }
+            const username = await databaseService.users.findOne({ username: value });
+            // Cho nay la username da ton tai, khong duoc trung username
+            if (username) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.USER_NAME_ALREADY_EXISTS,
+                status: HTTP_STATUS.BAD_REQUEST
+              });
+            }
+            return true;
+          }
+        }
       },
       avatar: imageSchema,
       cover_photo: imageSchema
@@ -471,26 +510,50 @@ export const updateMeValidator = validate(
 export const followValidator = validate(
   checkSchema(
     {
-      followed_user_id: {
+      followed_user_id: userIdSchema
+    },
+    ['body']
+  )
+);
+
+export const unFollowValidator = validate(
+  checkSchema(
+    {
+      user_id: userIdSchema
+    },
+    ['params']
+  )
+);
+
+export const changePasswordValidator = validate(
+  checkSchema(
+    {
+      old_password: {
+        ...passwordSchema,
         custom: {
           options: async (value, { req }) => {
-            if (!ObjectId.isValid(value)) {
-              throw new ErrorWithStatus({
-                message: USERS_MESSAGES.INVALID_FOLLOWED_USER_ID,
-                status: HTTP_STATUS.BAD_REQUEST
-              });
-            }
-            const followed_id = await databaseService.users.findOne({ _id: new ObjectId(value) });
-            if (!followed_id) {
+            const { user_id } = req.decoded_authorization as TokenPayload;
+            const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) });
+            if (!user) {
               throw new ErrorWithStatus({
                 message: USERS_MESSAGES.USER_NOT_FOUND,
                 status: HTTP_STATUS.NOT_FOUND
               });
             }
+            const { password } = user;
+            const isCorrectPassword = hasPassword(value) === password;
+            if (!isCorrectPassword) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.OLD_PASSWORD_INCORRECT,
+                status: HTTP_STATUS.BAD_REQUEST
+              });
+            }
             return true;
           }
         }
-      }
+      },
+      password: passwordSchema,
+      confirm_password: confirmPasswordSchema
     },
     ['body']
   )
