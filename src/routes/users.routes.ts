@@ -11,7 +11,8 @@ import {
   getMeController,
   updateMeController,
   getProfileController,
-  followController
+  followController,
+  OAuthController
 } from '~/controllers/users.controllers';
 import { filterMiddleware } from '~/middlewares/common.middlewares';
 import {
@@ -39,6 +40,14 @@ const userRouter = express.Router();
   Body:{ email:string, password:string }
  */
 userRouter.post('/login', loginValidator, wrapRequestHandler(loginController));
+
+/**
+ * 
+  Description: OAuth with Google
+  Path:'/oauth/google'
+  Method: get
+ */
+userRouter.get('/oauth/google', wrapRequestHandler(OAuthController));
 
 /**
  * 

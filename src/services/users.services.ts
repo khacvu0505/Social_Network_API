@@ -8,6 +8,9 @@ import User from '~/models/schemas/User.schema';
 import databaseService from '~/services/database.services';
 import { hasPassword } from '~/utils/crypto';
 import { signToken } from '~/utils/jwt';
+import axios from 'axios';
+import { ErrorWithStatus } from '~/models/Error';
+import HTTP_STATUS from '~/constants/httpStatus';
 
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -96,6 +99,11 @@ class UsersService {
     return Boolean(user);
   }
 
+  async findUser(email: string) {
+    const user = await databaseService.users.findOne({ email });
+    return user;
+  }
+
   async login(user_id: string, verify: UserVerifyStatus) {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
       user_id,
@@ -108,6 +116,82 @@ class UsersService {
       })
     );
     return { accessToken, refreshToken };
+  }
+
+  private async getOAuthgoogleToken(code: string) {
+    const body = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    };
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-for m-urlencoded'
+      }
+    });
+    return data as {
+      access_token: string;
+      id_token: string;
+    };
+  }
+
+  private async getGoogleUserInfo(access_token: string, id_token: string) {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+      params: {
+        access_token,
+        alt: 'json'
+      },
+      headers: {
+        Authorization: `Bearer ${id_token}`
+      }
+    });
+    return data as {
+      id: string;
+      email: string;
+      verified_email: boolean;
+      name: string;
+      given_name: string;
+      family_name: string;
+    };
+  }
+
+  async OAuth(code: string) {
+    const { access_token, id_token } = await this.getOAuthgoogleToken(code);
+    const userInfo = await this.getGoogleUserInfo(access_token, id_token);
+    if (!userInfo.verified_email) {
+      throw new ErrorWithStatus({
+        message: USERS_MESSAGES.GMAIL_NOT_VERIFIED,
+        status: HTTP_STATUS.BAD_REQUEST
+      });
+    }
+    // Kiểm tra email đã được đăng ký chưa
+    const user = await this.findUser(userInfo.email);
+    // Nếu tồn tại thì cho login vào website
+    if (user) {
+      const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+        user_id: user._id.toString(),
+        verify: user.verify
+      });
+      await databaseService.refreshTokens.insertOne(
+        new RefreshToken({
+          token: refreshToken,
+          user_id: new ObjectId(user._id)
+        })
+      );
+      return { accessToken, refreshToken, newUser: 0, verify: user.verify };
+    } else {
+      // Tạo mới user
+      const data = await this.register({
+        email: userInfo.email,
+        password: userInfo.id,
+        confirm_password: userInfo.id,
+        date_of_birth: new Date().toISOString(),
+        name: userInfo.name
+      });
+      return { ...data, newUser: 1, verify: UserVerifyStatus.Unverified };
+    }
   }
 
   async logout(refresh_token: string) {
@@ -141,6 +225,12 @@ class UsersService {
       user_id,
       verify: UserVerifyStatus.Verified
     });
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refreshToken,
+        user_id: new ObjectId(user_id)
+      })
+    );
     return { accessToken, refreshToken };
   }
 

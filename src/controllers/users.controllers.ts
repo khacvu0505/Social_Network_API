@@ -165,3 +165,11 @@ export const followController = async (req: Request<ParamsDictionary, any, Follo
 
   return res.status(HTTP_STATUS.OK).json(result);
 };
+
+export const OAuthController = async (req: Request, res: Response) => {
+  const { code } = req.query;
+  const result = await usersService.OAuth(code as string);
+  const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&newUser=${result.newUser}&verify=${result.verify}`;
+
+  return res.redirect(urlRedirect as string);
+};

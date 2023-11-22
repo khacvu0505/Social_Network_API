@@ -54,5 +54,6 @@ export const USERS_MESSAGES = {
   GET_PROFILE_SUCCESS: 'Get profile successfully',
   FOLLOW_SUCCESS: 'Follow successfully',
   INVALID_FOLLOWED_USER_ID: 'Invalid followed user id',
-  FOLLOWED: 'User was followed'
+  FOLLOWED: 'User was followed',
+  GMAIL_NOT_VERIFIED: 'Gmail not verified'
 } as const;
