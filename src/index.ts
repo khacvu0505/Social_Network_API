@@ -5,9 +5,10 @@ import { defaultErrorHandler } from './middlewares/errors.middlewares';
 import mediaRoute from './routes/media.routes';
 import path from 'path';
 import fs from 'fs';
-import { UPLOAD_DIR, UPLOAD_TEMP_DIR } from './constants/dir';
 import { config } from 'dotenv';
 import staticRoute from './routes/static.routes';
+import { initFolder } from './utils/files';
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
 
 config();
 
@@ -18,17 +19,10 @@ const port = process.env.PORT || 4000;
 databaseService.connect().catch(console.dir);
 
 // Public folder
-// app.use('/static', express.static(UPLOAD_DIR));
+// app.use('/static', express.static(UPLOAD_IMAGE_DIR));
 
 // Create folder upload if not exist
-const uploadDirTemp = path.resolve(UPLOAD_TEMP_DIR);
-if (!fs.existsSync(uploadDirTemp)) {
-  fs.mkdirSync(uploadDirTemp, { recursive: true });
-}
-const uploadDir = path.resolve(UPLOAD_DIR);
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+initFolder();
 
 // Parse data to json
 app.use(express.json());
@@ -37,6 +31,7 @@ app.use(express.json());
 app.use('/users', userRouter);
 app.use('/media', mediaRoute);
 app.use('/static', staticRoute);
+app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 // Error handler
 app.use(defaultErrorHandler);

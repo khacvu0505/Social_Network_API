@@ -200,3 +200,9 @@ export const changePasswordController = async (
     result
   });
 };
+
+export const refreshTokenController = async (req: Request, res: Response) => {
+  const { refresh_token } = req.body;
+  const { user_id, verify } = req.decoded_refresh_token as TokenPayload;
+  const result = await usersService.refreshToken(user_id, verify);
+};

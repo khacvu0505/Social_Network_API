@@ -14,7 +14,8 @@ import {
   followController,
   OAuthController,
   unFollowController,
-  changePasswordController
+  changePasswordController,
+  refreshTokenController
 } from '~/controllers/users.controllers';
 import { filterMiddleware } from '~/middlewares/common.middlewares';
 import {
@@ -71,6 +72,15 @@ userRouter.post('/register', registerValidator, wrapRequestHandler(registerContr
   Body:{refresh_token: string}
  */
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController));
+
+/**
+ * 
+  Description: Refresh Token
+  Path:'/refresh-token'
+  Method: Post
+  Body:{ refresh_token: string }
+ */
+userRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController));
 
 /**
  * 

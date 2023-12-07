@@ -64,5 +64,6 @@ export const USERS_MESSAGES = {
   USER_NAME_ALREADY_EXISTS: 'User name already exists',
   OLD_PASSWORD_INCORRECT: 'Old password incorrect',
   CHANGE_PASSWORD_SUCCESS: 'Change password successfully',
-  UPLOAD_IMAGE_SUCCESS: 'Upload image successfully'
+  UPLOAD_IMAGE_SUCCESS: 'Upload image successfully',
+  UPLOAD_VIDEO_SUCCESS: 'Upload video successfully'
 } as const;

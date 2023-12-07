@@ -9,7 +9,7 @@ const HTTP_STATUS = {
   FORBIDDEN: 403,
   BAD_REQUEST: 400,
   INTERNAL_SERVER_ERROR: 500,
-  PARTIAL_CONTENT: 206
+  PARTIAL_CONTENT: 206 // Content có nội dung chia thành nhiều đoạn thì trả về 206. VD như Streaming video
 } as const;
 
 export default HTTP_STATUS;

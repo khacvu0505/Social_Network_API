@@ -418,6 +418,16 @@ class UsersService {
     );
     return user.value;
   }
+
+  async refreshToken(user_id: string, verify: UserVerifyStatus) {
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      user_id: user_id.toString(),
+      verify
+    });
+    databaseService.refreshTokens.deleteOne({
+      token: 
+    });
+  }
 }
 
 const usersService = new UsersService();
