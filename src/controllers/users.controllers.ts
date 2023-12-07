@@ -12,6 +12,7 @@ import {
   GetProfileRequestParams,
   LoginRequestBody,
   LogoutRequestBody,
+  RefreshTokenRequestBody,
   RegisterRequestBody,
   ResetPasswordRequestBody,
   TokenPayload,
@@ -201,8 +202,15 @@ export const changePasswordController = async (
   });
 };
 
-export const refreshTokenController = async (req: Request, res: Response) => {
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenRequestBody>,
+  res: Response
+) => {
   const { refresh_token } = req.body;
   const { user_id, verify } = req.decoded_refresh_token as TokenPayload;
-  const result = await usersService.refreshToken(user_id, verify);
+  const result = await usersService.refreshToken({ user_id, verify, refresh_token });
+  return res.status(HTTP_STATUS.OK).json({
+    message: USERS_MESSAGES.REFRESH_TOKEN_SUCCESS,
+    result
+  });
 };
