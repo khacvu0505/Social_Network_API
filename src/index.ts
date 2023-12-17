@@ -21,6 +21,8 @@ databaseService
   .then(() => {
     // Call function create index collection after connect to database
     databaseService.indexUser();
+    databaseService.indexRefreshToken();
+    databaseService.indexFollower();
   })
   .catch(console.dir);
 

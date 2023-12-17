@@ -42,10 +42,33 @@ class DatabaseService {
     return this.db.collection(process.env.DB_COLLECTION_FOLLOWERS as string);
   }
 
-  indexUser() {
+  // Create indexes for some fields to improve query performance of collection USERS
+  async indexUser() {
+    const exists = await this.users.indexExists(['username_1_password_1', 'email_1', 'username_1']);
+    if (exists) return;
+
     this.users.createIndex({ username: 1, password: 1 }, { unique: true });
     this.users.createIndex({ email: 1 }, { unique: true });
     this.users.createIndex({ username: 1 }, { unique: true });
+  }
+
+  // Create indexes for some fields to improve query performance of collection REFRESH_TOKENS
+  async indexRefreshToken() {
+    const exists = await this.refreshTokens.indexExists(['exp_1', 'token_1']);
+    if (exists) return;
+
+    this.refreshTokens.createIndex({ token: 1 }, { unique: true });
+
+    // Chỗ này là background_task của mongodb dựa vào field exp để xóa data
+    this.refreshTokens.createIndex({ exp: 1 }, { expireAfterSeconds: 0 });
+  }
+
+  // Create indexes for some fields to improve query performance of collection USERS
+  async indexFollower() {
+    const exists = await this.followers.indexExists(['followed_user_id_1_user_id_1']);
+    if (exists) return;
+
+    this.followers.createIndex({ followed_user_id: 1, user_id: 1 }, { unique: true });
   }
 }
 
