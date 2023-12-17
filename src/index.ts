@@ -16,7 +16,13 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Connect to database service
-databaseService.connect().catch(console.dir);
+databaseService
+  .connect()
+  .then(() => {
+    // Call function create index collection after connect to database
+    databaseService.indexUser();
+  })
+  .catch(console.dir);
 
 // Public folder
 // app.use('/static', express.static(UPLOAD_IMAGE_DIR));

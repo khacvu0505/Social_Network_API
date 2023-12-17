@@ -41,6 +41,12 @@ class DatabaseService {
   get followers(): Collection<Follower> {
     return this.db.collection(process.env.DB_COLLECTION_FOLLOWERS as string);
   }
+
+  indexUser() {
+    this.users.createIndex({ username: 1, password: 1 }, { unique: true });
+    this.users.createIndex({ email: 1 }, { unique: true });
+    this.users.createIndex({ username: 1 }, { unique: true });
+  }
 }
 
 const databaseService = new DatabaseService();
