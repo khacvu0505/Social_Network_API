@@ -9,6 +9,8 @@ import { config } from 'dotenv';
 import staticRoute from './routes/static.routes';
 import { initFolder } from './utils/files';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
+import tweetRouter from './routes/tweets.routes';
+import bookmarkRouter from './routes/bookmarks.routes';
 
 config();
 
@@ -39,6 +41,9 @@ app.use(express.json());
 app.use('/users', userRouter);
 app.use('/media', mediaRoute);
 app.use('/static', staticRoute);
+app.use('/tweets', tweetRouter);
+app.use('/bookmarks', bookmarkRouter);
+
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 // Error handler

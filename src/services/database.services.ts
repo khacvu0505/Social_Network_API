@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 import User from '~/models/schemas/User.schema';
 import RefreshToken from '~/models/schemas/RefreshToken.schema';
 import Follower from '~/models/schemas/Follower.schema';
+import Tweet from '~/models/schemas/Tweet.schema';
+import Hashtag from '~/models/schemas/Hashtag.schema';
+import Bookmark from '~/models/schemas/Bookmark.schema';
 
 dotenv.config();
 // dotenv.config({ path: "./config.env" });
@@ -40,6 +43,18 @@ class DatabaseService {
 
   get followers(): Collection<Follower> {
     return this.db.collection(process.env.DB_COLLECTION_FOLLOWERS as string);
+  }
+
+  get tweets(): Collection<Tweet> {
+    return this.db.collection(process.env.DB_COLLECTION_TWEETS as string);
+  }
+
+  get hashtags(): Collection<Hashtag> {
+    return this.db.collection(process.env.DB_COLLECTION_HASHTAGS as string);
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection(process.env.DB_COLLECTION_BOOKMARKS as string);
   }
 
   // Create indexes for some fields to improve query performance of collection USERS
