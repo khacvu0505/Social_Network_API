@@ -18,7 +18,7 @@ class UsersService {
       payload: { user_id, token_type: TokenType.AccessToken, verify },
       options: {
         algorithm: 'HS256',
-        expiresIn: '15m'
+        expiresIn: '30m'
       },
       privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
     });

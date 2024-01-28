@@ -1,3 +1,4 @@
+import { ParamsDictionary, Query } from 'express-serve-static-core';
 import { TweetAudience, TweetType } from '~/constants/enum';
 import { Media } from '../Other';
 
@@ -9,4 +10,17 @@ export interface TweetRequestBody {
   hashtags: string[];
   mentions: string[]; // user_id[]
   medias: Media[];
+}
+
+export interface TweetParam extends ParamsDictionary {
+  tweet_id: string;
+}
+
+export interface Pagination {
+  page: string;
+  limit: string;
+}
+
+export interface TweetQuery extends Query, Pagination {
+  tweet_type: string;
 }

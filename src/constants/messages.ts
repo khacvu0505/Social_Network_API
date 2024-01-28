@@ -66,7 +66,8 @@ export const USERS_MESSAGES = {
   CHANGE_PASSWORD_SUCCESS: 'Change password successfully',
   UPLOAD_IMAGE_SUCCESS: 'Upload image successfully',
   UPLOAD_VIDEO_SUCCESS: 'Upload video successfully',
-  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully'
+  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully',
+  USER_WAS_BANNED: 'User was banned'
 } as const;
 
 export const TWEETS_MESSAGE = {
@@ -79,9 +80,17 @@ export const TWEETS_MESSAGE = {
   HASHTAGS_MUST_BE_AN_ARRAY_OF_STRING: 'Hashtags must be an array of string',
   MENTIONS_MUST_BE_AN_ARRAY_OF_USER_ID: 'Mentions must be an array of user_id',
   MEDIAS_MUST_BE_AN_ARRAY_OF_MEDIA_OBJECT: 'Medias must be an array of media object',
-  CREATE_TWEET_SUCCESS: 'Create tweet successfully'
+  CREATE_TWEET_SUCCESS: 'Create tweet successfully',
+  INVALID_TWEET_ID: 'Invalid tweet id',
+  TWEET_NOT_FOUND: 'Tweet not found',
+  GET_TWEET_SUCCESS: 'Get tweet successfully',
+  PERMISSION_DENIED: 'Permission denied',
+  LIMIT_MUST_BE_GREATER_THAN_0_AND_LESS_THAN_100: 'Limit must be greater than 0 and less than 100',
+  PAGE_MUST_BE_GREATER_THAN_0: 'Page must be greater than 0',
+  GET_NEW_FEEDS_SUCCESS: 'Get new feeds successfully'
 } as const;
 
 export const BOOKMARK_MESSAGE = {
-  BOOKMARK_TWEET_SUCCESS: 'Bookmark tweet successfully'
+  BOOKMARK_TWEET_SUCCESS: 'Bookmark tweet successfully',
+  UNBOOKMARK_TWEET_SUCCESS: 'Unbookmark tweet successfully'
 } as const;

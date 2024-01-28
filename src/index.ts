@@ -11,6 +11,8 @@ import { initFolder } from './utils/files';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
 import tweetRouter from './routes/tweets.routes';
 import bookmarkRouter from './routes/bookmarks.routes';
+// Run fetch fake data
+// import '~/utils/fake';
 
 config();
 
