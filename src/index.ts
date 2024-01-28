@@ -11,6 +11,7 @@ import { initFolder } from './utils/files';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
 import tweetRouter from './routes/tweets.routes';
 import bookmarkRouter from './routes/bookmarks.routes';
+import searchRouter from './routes/search.routes';
 // Run fetch fake data
 // import '~/utils/fake';
 
@@ -27,6 +28,7 @@ databaseService
     databaseService.indexUser();
     databaseService.indexRefreshToken();
     databaseService.indexFollower();
+    databaseService.indexTweet();
   })
   .catch(console.dir);
 
@@ -44,6 +46,7 @@ app.use('/users', userRouter);
 app.use('/media', mediaRoute);
 app.use('/static', staticRoute);
 app.use('/tweets', tweetRouter);
+app.use('/search', searchRouter);
 app.use('/bookmarks', bookmarkRouter);
 
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));

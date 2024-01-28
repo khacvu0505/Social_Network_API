@@ -85,6 +85,18 @@ class DatabaseService {
 
     this.followers.createIndex({ followed_user_id: 1, user_id: 1 }, { unique: true });
   }
+
+  async indexTweet() {
+    const exists = await this.tweets.indexExists(['content_text']);
+    if (!exists) {
+      this.tweets.createIndex(
+        { content: 'text' },
+        // Chỗ này là cho phép mongodb tìm những từ trong list stopword của mongodb. Ex: who, a, an, and, are, as, at, for, from, has, have, he, in, is, it, its, of, on, or, that, the, to, was, were, with
+        // Nếu mình k làm vậy thì mongodb sẽ bỏ qua những từ này, dù cho có trong db thì cũng sẽ tìm không thấy và không trả về kq
+        { default_language: 'none' }
+      );
+    }
+  }
 }
 
 const databaseService = new DatabaseService();

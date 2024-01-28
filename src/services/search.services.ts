@@ -1,0 +1,291 @@
+import { ObjectId } from 'mongodb';
+import databaseService from './database.services';
+import { MediaType, MediaTypeQuery, PeopleFollow, TweetType } from '~/constants/enum';
+
+class SearchService {
+  async search({
+    content,
+    limit,
+    page,
+    user_id,
+    media_type,
+    people_follow
+  }: {
+    content: string;
+    limit: string;
+    page: string;
+    user_id: string;
+    media_type?: MediaTypeQuery;
+    people_follow?: PeopleFollow;
+  }) {
+    const match = {
+      $text: {
+        $search: content
+      }
+    };
+    if (media_type) {
+      switch (media_type) {
+        case MediaTypeQuery.Image:
+          match['medias.type'] = {
+            $in: [MediaType.Image]
+          };
+          break;
+        case MediaTypeQuery.Video:
+          match['medias.type'] = {
+            $in: [MediaType.Video]
+          };
+          break;
+        default:
+          break;
+      }
+    }
+    // Search tweet từ người mà ta follow và mọi người
+    // Nếu mà muốn search những người mà mình k follow thì people_follow là 0
+    if (people_follow && people_follow === PeopleFollow.Following) {
+      const user_id_object = new ObjectId(user_id);
+      const followed_user_id = await databaseService.followers
+        .find(
+          { user_id: user_id_object },
+          {
+            projection: {
+              followed_user_id: 1,
+              _id: 0
+            }
+          }
+        )
+        .toArray();
+      const ids = followed_user_id.map((item) => item.followed_user_id);
+      // Mong muốn newfeeds sẽ lấy luôn cả tweet của mình
+      ids.push(user_id_object);
+
+      match['user_id'] = {
+        $in: ids
+      };
+    }
+
+    const [tweets, total] = await Promise.all([
+      databaseService.tweets
+        .aggregate([
+          {
+            $match: match
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'user_id',
+              foreignField: '_id',
+              as: 'user'
+            }
+          },
+          {
+            $unwind: {
+              path: '$user'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                {
+                  audience: 0
+                },
+                {
+                  $and: [
+                    {
+                      audience: 1
+                    },
+                    {
+                      'user.twitter_circle': {
+                        $in: [user_id]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            $skip: +limit * (+page - 1) // Công thức phân trang
+          },
+          {
+            $limit: +limit
+          },
+          {
+            $lookup: {
+              from: 'hashtags',
+              localField: 'hashtags',
+              foreignField: '_id',
+              as: 'hashtags'
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'mentions',
+              foreignField: '_id',
+              as: 'mentions'
+            }
+          },
+          {
+            $addFields: {
+              mentions: {
+                $map: {
+                  input: '$mentions',
+                  as: 'mention',
+                  in: {
+                    _id: '$$mention._id',
+                    name: '$$mention.name',
+                    username: '$$mention.username',
+                    email: '$$mention.email'
+                  }
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'bookmarks',
+              localField: '_id',
+              foreignField: 'tweet_id',
+              as: 'bookmarks'
+            }
+          },
+          {
+            $lookup: {
+              from: 'likes',
+              localField: '_id',
+              foreignField: 'tweet_id',
+              as: 'likes'
+            }
+          },
+          {
+            $lookup: {
+              from: 'tweets',
+              localField: '_id',
+              foreignField: 'parent_id',
+              as: 'tweet_children'
+            }
+          },
+          {
+            $addFields: {
+              bookmarks: {
+                $size: '$bookmarks'
+              },
+              likes: {
+                $size: '$likes'
+              },
+              retweet_count: {
+                $size: {
+                  $filter: {
+                    input: '$tweet_children',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TweetType.Retweet]
+                    }
+                  }
+                }
+              },
+              comment_count: {
+                $size: {
+                  $filter: {
+                    input: '$tweet_children',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TweetType.Comment]
+                    }
+                  }
+                }
+              },
+              quote_count: {
+                $size: {
+                  $filter: {
+                    input: '$tweet_children',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TweetType.QuoteTweet]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              tweet_children: 0,
+              user: {
+                password: 0,
+                email_verify_token: 0,
+                forgot_password_token: 0,
+                twitter_circle: 0,
+                date_of_birth: 0
+              }
+            }
+          }
+        ])
+        .toArray(),
+      databaseService.tweets
+        .aggregate(
+          [
+            {
+              $match: match
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'user_id',
+                foreignField: '_id',
+                as: 'user'
+              }
+            },
+            {
+              $unwind: {
+                path: '$user'
+              }
+            },
+            {
+              $match: {
+                $or: [
+                  {
+                    audience: 0
+                  },
+                  {
+                    $and: [
+                      {
+                        audience: 1
+                      },
+                      {
+                        'user.twitter_circle': {
+                          $in: [user_id]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              $count: 'total'
+            }
+          ],
+          {}
+        )
+        .toArray()
+    ]);
+
+    // Chỗ này là muốn return document về cho client, Mà updateOne k có support trả về data sau khi update nên phải làm vậy
+    tweets.forEach((tweet) => {
+      tweet.updated_at = new Date();
+      tweet.user_views += 1;
+    });
+
+    return {
+      tweets,
+      totalDocuments: total[0]?.total || 0,
+      totalPages: Math.ceil((total[0]?.total || 0) / +limit),
+      page: +page,
+      limit: +limit
+    };
+  }
+}
+
+const searchService = new SearchService();
+export default searchService;

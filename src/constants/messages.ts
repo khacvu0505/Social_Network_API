@@ -94,3 +94,9 @@ export const BOOKMARK_MESSAGE = {
   BOOKMARK_TWEET_SUCCESS: 'Bookmark tweet successfully',
   UNBOOKMARK_TWEET_SUCCESS: 'Unbookmark tweet successfully'
 } as const;
+
+export const SEARCH_MESSAGE = {
+  CONTENT_MUST_BE_A_STRING: 'Content must be a string',
+  MEDIA_TYPE_IS_NOT_VALID: 'Media Type is not valid',
+  PEOPLE_FOLLOW_MUST_BE_0_OR_1: 'People follow must be 0 or 1'
+};
