@@ -11,6 +11,7 @@ import { signToken, verifyToken } from '~/utils/jwt';
 import axios from 'axios';
 import { ErrorWithStatus } from '~/models/Error';
 import HTTP_STATUS from '~/constants/httpStatus';
+import { sendVerifyEmail } from '~/utils/email';
 
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -116,6 +117,22 @@ class UsersService {
         exp
       })
     );
+
+    // Follow send email
+    // 1. Server send email to user
+    // 2. User click link in email
+    // 3. client send request to server with email_verify_token
+    // 4. Sever verify email_verify_token
+    // 5. Client receive access_token and refresh_token
+    await sendVerifyEmail(
+      payload.email,
+      'Verify your email',
+      `<h1>Verify your email to continue</h1>
+      <p>Click  <a href="${process.env.CLIENT_URL}/verify-email/?token=${email_verify_token}">here</a> to verify your email</p>
+     
+      `
+    );
+
     return { accessToken, refreshToken };
   }
 
