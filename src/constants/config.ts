@@ -1,11 +1,14 @@
 import argv from 'minimist';
 import { config } from 'dotenv';
 
-config();
-
 const option = argv(process.argv.slice(2));
+console.log('options', option);
 
-export const isProduction = Boolean(option.production);
+export const isProduction = option.env === 'production';
+
+config({
+  path: option.env ? `.env.${option.env}` : '.env'
+});
 
 export const envConfig = {
   REGION_AWS: process.env.AWS_REGION as string,
