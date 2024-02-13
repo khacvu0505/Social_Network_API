@@ -6,6 +6,7 @@ import Follower from '~/models/schemas/Follower.schema';
 import Tweet from '~/models/schemas/Tweet.schema';
 import Hashtag from '~/models/schemas/Hashtag.schema';
 import Bookmark from '~/models/schemas/Bookmark.schema';
+import Conversation from '~/models/schemas/Conversation.schema';
 
 dotenv.config();
 // dotenv.config({ path: "./config.env" });
@@ -55,6 +56,9 @@ class DatabaseService {
 
   get bookmarks(): Collection<Bookmark> {
     return this.db.collection(process.env.DB_COLLECTION_BOOKMARKS as string);
+  }
+  get conversations(): Collection<Conversation> {
+    return this.db.collection(process.env.DB_COLLECTION_CONVERSATIONS as string);
   }
 
   // Create indexes for some fields to improve query performance of collection USERS

@@ -11,7 +11,7 @@ import { signToken, verifyToken } from '~/utils/jwt';
 import axios from 'axios';
 import { ErrorWithStatus } from '~/models/Error';
 import HTTP_STATUS from '~/constants/httpStatus';
-import { sendVerifyEmail } from '~/utils/email';
+import { sendForgotPasswordEmail, sendVerifyRegisterEmail } from '~/utils/email';
 
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -19,7 +19,7 @@ class UsersService {
       payload: { user_id, token_type: TokenType.AccessToken, verify },
       options: {
         algorithm: 'HS256',
-        expiresIn: '30m'
+        expiresIn: '5h'
       },
       privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
     });
@@ -124,14 +124,15 @@ class UsersService {
     // 3. client send request to server with email_verify_token
     // 4. Sever verify email_verify_token
     // 5. Client receive access_token and refresh_token
-    await sendVerifyEmail(
-      payload.email,
-      'Verify your email',
-      `<h1>Verify your email to continue</h1>
-      <p>Click  <a href="${process.env.CLIENT_URL}/verify-email/?token=${email_verify_token}">here</a> to verify your email</p>
-     
-      `
-    );
+    // await sendVerifyEmail(
+    //   payload.email,
+    //   'Verify your email',
+    //   `<h1>Verify your email to continue</h1>
+    //   <p>Click  <a href="${process.env.CLIENT_URL}/verify-email/?token=${email_verify_token}">here</a> to verify your email</p>
+
+    //   `
+    // );
+    await sendVerifyRegisterEmail(payload.email, email_verify_token);
 
     return { accessToken, refreshToken };
   }
@@ -290,11 +291,11 @@ class UsersService {
     return { accessToken, refreshToken };
   }
 
-  async resendVerifyEmail(user_id: string) {
+  async resendVerifyEmail(user_id: string, email: string) {
     const email_verify_token = await this.signEmailVerifyToken({ user_id, verify: UserVerifyStatus.Unverified });
 
     // Gia bo gui email
-    console.log('Resend verify email token: ', email_verify_token);
+    await sendVerifyRegisterEmail(email, email_verify_token);
 
     // Update email_verify_token in database
     await databaseService.users.updateOne(
@@ -313,7 +314,7 @@ class UsersService {
     };
   }
 
-  async forgotPassword(user_id: string, verify: UserVerifyStatus) {
+  async forgotPassword(user_id: string, verify: UserVerifyStatus, email: string) {
     const forgot_password_token = await this.signForgotVerifyToken({
       user_id,
       verify
@@ -332,7 +333,7 @@ class UsersService {
       }
     );
     // Send link to email user
-    console.log('Forgot password token: ', forgot_password_token);
+    await sendForgotPasswordEmail(email, forgot_password_token);
 
     return {
       message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD

@@ -81,7 +81,7 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
     });
   }
 
-  const result = await usersService.resendVerifyEmail(user_id);
+  const result = await usersService.resendVerifyEmail(user_id, user.email);
   return res.status(HTTP_STATUS.OK).json(result);
 };
 
@@ -91,7 +91,7 @@ export const forgotPasswordController = async (
 ) => {
   const user = req.user as User;
 
-  const result = await usersService.forgotPassword(user._id.toString(), user.verify);
+  const result = await usersService.forgotPassword(user._id.toString(), user.verify, user.email);
   return res.status(HTTP_STATUS.OK).json(result);
 };
 

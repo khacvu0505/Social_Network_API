@@ -38,11 +38,35 @@ import { wrapRequestHandler } from '~/utils/handlers';
 const userRouter = express.Router();
 
 /**
- * 
-  Description: Login
-  Path:'/login'
-  Method: Post
-  Body:{ email:string, password:string }
+ * @swagger
+ * /users/login:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Đăng nhập
+ *     description: Đăng nhập vào hệ thống
+ *     operationId: login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginBody'
+ *     responses:
+ *       '200':
+ *         description: Đăng nhập thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Login Successfully'
+ *                 result:
+ *                   $ref: '#/components/schemas/SuccessAuthentication'
+ *       '422':
+ *         description: Invalid Input
  */
 userRouter.post('/login', loginValidator, wrapRequestHandler(loginController));
 

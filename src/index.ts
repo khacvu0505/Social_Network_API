@@ -12,13 +12,45 @@ import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
 import tweetRouter from './routes/tweets.routes';
 import bookmarkRouter from './routes/bookmarks.routes';
 import searchRouter from './routes/search.routes';
+import cors from 'cors';
+// import '~/utils/s3';
+import { createServer } from 'http';
+import conversationRouter from './routes/conversations.routes';
+import { initSocket } from './utils/socket';
 // Run fetch fake data
 // import '~/utils/fake';
+
+// Swagger
+import swaggerJSDoc from 'swagger-jsdoc';
+
+import YAML from 'yaml';
+import swaggerUi from 'swagger-ui-express';
+const fileSwagger = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
+const swaggerDocument = YAML.parse(fileSwagger);
+
+const options: swaggerJSDoc.Options = {
+  failOnErrors: true, // Whether or not to throw when parsing errors. Defaults to false.
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Social Network API',
+      version: '1.0.0'
+    }
+  },
+  apis: ['./src/openapi/*.yaml']
+  // apis: ['./src/routes/*.routes.ts', './src/models/requests/*.requests.ts']
+};
+const openapiSpecification = swaggerJSDoc(options);
 
 config();
 
 const app = express();
 const port = process.env.PORT || 4000;
+
+const httpServer = createServer(app);
+
+// Use cors
+app.use(cors());
 
 // Connect to database service
 databaseService
@@ -50,10 +82,20 @@ app.use('/search', searchRouter);
 app.use('/bookmarks', bookmarkRouter);
 
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
+app.use('/conversations', conversationRouter);
+
+// Option 1: Chỗ này là dùng swagger-ui-express để viết document cho toàn bộ api trong duy nhất 1 file (.json or .yaml)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+
+//Option 2: Chỗ này là dùng swagger-jsdoc của viết document cho mỗi route
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+
+// Init socket
+initSocket(httpServer);
 
 // Error handler
 app.use(defaultErrorHandler);
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
