@@ -3,16 +3,12 @@ import { getNameFromFullName, handleUploadImage, handleUploadVideo } from '~/uti
 import sharp from 'sharp';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir';
 import path from 'node:path';
-import fs from 'fs';
-import { config } from 'dotenv';
-import { isProduction } from '~/constants/config';
 import { MediaType } from '~/constants/enum';
 import { Media } from '~/models/Other';
 import { uploadFileToS3 } from '~/utils/s3';
 import mime from 'mime';
 import fsPromise from 'fs/promises';
 import { CompleteMultipartUploadCommandOutput } from '@aws-sdk/client-s3';
-config();
 
 class MediaService {
   async uploadImage(req: Request) {

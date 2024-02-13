@@ -10,6 +10,7 @@ import { verifyAccessToken } from './common';
 import databaseService from '~/services/database.services';
 import Conversation from '~/models/schemas/Conversation.schema';
 import { Server } from 'socket.io';
+import { envConfig } from '~/constants/config';
 
 export const initSocket = (httpServer: ServerHttp) => {
   const io = new Server(httpServer, {
@@ -39,7 +40,7 @@ export const initSocket = (httpServer: ServerHttp) => {
       }
       const decoded = verifyToken({
         token: access_token,
-        secretKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
+        secretKey: envConfig.JWT_SECRET_ACCESS_TOKEN
       });
       const { verify } = decoded as TokenPayload;
       if (verify !== UserVerifyStatus.Verified) {

@@ -1,5 +1,4 @@
 import { Collection, Db, MongoClient } from 'mongodb';
-import dotenv from 'dotenv';
 import User from '~/models/schemas/User.schema';
 import RefreshToken from '~/models/schemas/RefreshToken.schema';
 import Follower from '~/models/schemas/Follower.schema';
@@ -7,21 +6,16 @@ import Tweet from '~/models/schemas/Tweet.schema';
 import Hashtag from '~/models/schemas/Hashtag.schema';
 import Bookmark from '~/models/schemas/Bookmark.schema';
 import Conversation from '~/models/schemas/Conversation.schema';
+import { envConfig } from '~/constants/config';
 
-dotenv.config();
-// dotenv.config({ path: "./config.env" });
-
-const uri = process.env.DB_URI?.replace('<username>', process.env.DB_USERNAME as string).replace(
-  '<password>',
-  process.env.DB_PASSWORD as string
-);
+const uri = envConfig.DB_URI?.replace('<username>', envConfig.DB_USERNAME).replace('<password>', envConfig.DB_PASSWORD);
 
 class DatabaseService {
   private client: MongoClient;
   private db: Db;
   constructor() {
     this.client = new MongoClient(uri as string);
-    this.db = this.client.db(process.env.DB_NAME);
+    this.db = this.client.db(envConfig.DB_NAME);
   }
   async connect() {
     try {
@@ -35,30 +29,30 @@ class DatabaseService {
   }
 
   get users(): Collection<User> {
-    return this.db.collection(process.env.DB_COLLECTION_USERS as string);
+    return this.db.collection(envConfig.DB_COLLECTION_USERS);
   }
 
   get refreshTokens(): Collection<RefreshToken> {
-    return this.db.collection(process.env.DB_COLLECTION_REFRESH_TOKEN as string);
+    return this.db.collection(envConfig.DB_COLLECTION_REFRESH_TOKEN);
   }
 
   get followers(): Collection<Follower> {
-    return this.db.collection(process.env.DB_COLLECTION_FOLLOWERS as string);
+    return this.db.collection(envConfig.DB_COLLECTION_FOLLOWERS);
   }
 
   get tweets(): Collection<Tweet> {
-    return this.db.collection(process.env.DB_COLLECTION_TWEETS as string);
+    return this.db.collection(envConfig.DB_COLLECTION_TWEETS);
   }
 
   get hashtags(): Collection<Hashtag> {
-    return this.db.collection(process.env.DB_COLLECTION_HASHTAGS as string);
+    return this.db.collection(envConfig.DB_COLLECTION_HASHTAGS);
   }
 
   get bookmarks(): Collection<Bookmark> {
-    return this.db.collection(process.env.DB_COLLECTION_BOOKMARKS as string);
+    return this.db.collection(envConfig.DB_COLLECTION_BOOKMARKS);
   }
   get conversations(): Collection<Conversation> {
-    return this.db.collection(process.env.DB_COLLECTION_CONVERSATIONS as string);
+    return this.db.collection(envConfig.DB_COLLECTION_CONVERSATIONS);
   }
 
   // Create indexes for some fields to improve query performance of collection USERS

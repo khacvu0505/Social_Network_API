@@ -24,7 +24,7 @@ import {
 import User from '~/models/schemas/User.schema';
 import databaseService from '~/services/database.services';
 import usersService from '~/services/users.services';
-import pick from 'lodash/pick';
+import { envConfig } from '~/constants/config';
 
 export const loginController = async (req: Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User;
@@ -172,7 +172,7 @@ export const followController = async (req: Request<ParamsDictionary, any, Follo
 export const OAuthController = async (req: Request, res: Response) => {
   const { code } = req.query;
   const result = await usersService.OAuth(code as string);
-  const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&newUser=${result.newUser}&verify=${result.verify}`;
+  const urlRedirect = `${envConfig.CLIENT_REDIRECT_CALLBACK}?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&newUser=${result.newUser}&verify=${result.verify}`;
 
   return res.redirect(urlRedirect as string);
 };

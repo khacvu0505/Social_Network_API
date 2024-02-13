@@ -5,7 +5,6 @@ import { defaultErrorHandler } from './middlewares/errors.middlewares';
 import mediaRoute from './routes/media.routes';
 import path from 'path';
 import fs from 'fs';
-import { config } from 'dotenv';
 import staticRoute from './routes/static.routes';
 import { initFolder } from './utils/files';
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir';
@@ -25,6 +24,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 
 import YAML from 'yaml';
 import swaggerUi from 'swagger-ui-express';
+import { envConfig } from './constants/config';
 const fileSwagger = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
 const swaggerDocument = YAML.parse(fileSwagger);
 
@@ -42,10 +42,8 @@ const options: swaggerJSDoc.Options = {
 };
 const openapiSpecification = swaggerJSDoc(options);
 
-config();
-
 const app = express();
-const port = process.env.PORT || 4000;
+const port = envConfig.PORT;
 
 const httpServer = createServer(app);
 

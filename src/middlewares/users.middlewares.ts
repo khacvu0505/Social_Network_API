@@ -1,4 +1,4 @@
-import e, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ParamSchema, checkSchema } from 'express-validator';
 import { USERS_MESSAGES } from '~/constants/messages';
 import databaseService from '~/services/database.services';
@@ -14,6 +14,7 @@ import { ObjectId } from 'mongodb';
 import { TokenPayload } from '~/models/requests/User.requests';
 import { UserVerifyStatus } from '~/constants/enum';
 import { REGEX_USERNAME } from '~/constants/regex';
+import { envConfig } from '~/constants/config';
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -82,7 +83,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
       try {
         const decoded = verifyToken({
           token: value,
-          secretKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
+          secretKey: envConfig.JWT_SECRET_FORGOT_PASSWORD_TOKEN
         });
         const user = await databaseService.users.findOne({ _id: new ObjectId(decoded.user_id) });
         // Case user not found
@@ -252,7 +253,7 @@ export const accessTokenValidator = validate(
               }
               const decoded = verifyToken({
                 token: access_token,
-                secretKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
+                secretKey: envConfig.JWT_SECRET_ACCESS_TOKEN
               });
 
               (req as Request).decoded_authorization = decoded;
@@ -285,7 +286,7 @@ export const refreshTokenValidator = validate(
               });
             }
             try {
-              const decoded = verifyToken({ token: value, secretKey: process.env.JWT_SECRET_REFRESH_TOKEN as string });
+              const decoded = verifyToken({ token: value, secretKey: envConfig.JWT_SECRET_REFRESH_TOKEN });
 
               const refresh_token = await databaseService.refreshTokens.findOne({ token: value });
 
@@ -331,7 +332,7 @@ export const verifyEmailTokenValidator = validate(
             try {
               const decoded = verifyToken({
                 token: value,
-                secretKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
+                secretKey: envConfig.JWT_SECRET_EMAIL_VERIFY_TOKEN
               });
               const user = await databaseService.users.findOne({
                 _id: new ObjectId(decoded.user_id)

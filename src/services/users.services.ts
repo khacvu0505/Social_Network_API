@@ -12,6 +12,7 @@ import axios from 'axios';
 import { ErrorWithStatus } from '~/models/Error';
 import HTTP_STATUS from '~/constants/httpStatus';
 import { sendForgotPasswordEmail, sendVerifyRegisterEmail } from '~/utils/email';
+import { envConfig } from '~/constants/config';
 
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -21,7 +22,7 @@ class UsersService {
         algorithm: 'HS256',
         expiresIn: '5h'
       },
-      privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
+      privateKey: envConfig.JWT_SECRET_ACCESS_TOKEN
     });
   }
 
@@ -30,7 +31,7 @@ class UsersService {
     if (exp) {
       return signToken({
         payload: { user_id, token_type: TokenType.RefreshToken, verify, exp },
-        privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+        privateKey: envConfig.JWT_SECRET_REFRESH_TOKEN
       });
     }
     return signToken({
@@ -39,7 +40,7 @@ class UsersService {
         algorithm: 'HS256',
         expiresIn: '7d'
       },
-      privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+      privateKey: envConfig.JWT_SECRET_REFRESH_TOKEN
     });
   }
 
@@ -50,7 +51,7 @@ class UsersService {
         algorithm: 'HS256',
         expiresIn: '7d'
       },
-      privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
+      privateKey: envConfig.JWT_SECRET_EMAIL_VERIFY_TOKEN
     });
   }
 
@@ -61,7 +62,7 @@ class UsersService {
         algorithm: 'HS256',
         expiresIn: '7d'
       },
-      privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
+      privateKey: envConfig.JWT_SECRET_FORGOT_PASSWORD_TOKEN
     });
   }
 
@@ -81,7 +82,7 @@ class UsersService {
   private decodeRefreshToken(refresh_token: string) {
     return verifyToken({
       token: refresh_token,
-      secretKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+      secretKey: envConfig.JWT_SECRET_REFRESH_TOKEN
     });
   }
 
@@ -168,9 +169,9 @@ class UsersService {
   private async getOAuthgoogleToken(code: string) {
     const body = {
       code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      client_id: envConfig.GOOGLE_CLIENT_ID,
+      client_secret: envConfig.GOOGLE_CLIENT_SECRET,
+      redirect_uri: envConfig.GOOGLE_REDIRECT_URI,
       grant_type: 'authorization_code'
     };
     const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
