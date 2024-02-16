@@ -1,13 +1,16 @@
-import argv from 'minimist';
 import { config } from 'dotenv';
 
-const option = argv(process.argv.slice(2));
-console.log('options', option);
+const env = process.env.NODE_ENV;
 
-export const isProduction = option.env === 'production';
+if (!env) {
+  console.log('NODE_ENV is not defined');
+  process.exit(1);
+}
+
+export const isProduction = env === 'production';
 
 config({
-  path: option.env ? `.env.${option.env}` : '.env'
+  path: env ? `.env.${env}` : '.env'
 });
 
 export const envConfig = {
