@@ -16,6 +16,8 @@ import cors from 'cors';
 import { createServer } from 'http';
 import conversationRouter from './routes/conversations.routes';
 import { initSocket } from './utils/socket';
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
 // Run fetch fake data
 // import '~/utils/fake';
 
@@ -24,7 +26,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 
 import YAML from 'yaml';
 import swaggerUi from 'swagger-ui-express';
-import { envConfig } from './constants/config';
+import { envConfig, isProduction } from './constants/config';
 const fileSwagger = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
 const swaggerDocument = YAML.parse(fileSwagger);
 
@@ -47,8 +49,26 @@ const port = envConfig.PORT;
 
 const httpServer = createServer(app);
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Use an external store for consistency across multiple server instances.
+});
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter);
+
+// Use Helmet!
+app.use(helmet());
+
 // Use cors
-app.use(cors());
+app.use(
+  cors({
+    origin: isProduction ? envConfig.CLIENT_URL : '*'
+  })
+);
 
 // Connect to database service
 databaseService
