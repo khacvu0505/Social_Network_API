@@ -1,6 +1,6 @@
-# Twitter API: https://khacvu.site/api-docs/
+# Social Network API 
 
-## Learn NodeJS with MongoDB
+## Learn NodeJS(Express) with MongoDB
 
 ### Authentication: JWT
 
