@@ -9,6 +9,7 @@ import { uploadFileToS3 } from '~/utils/s3';
 import mime from 'mime';
 import fsPromise from 'fs/promises';
 import { CompleteMultipartUploadCommandOutput } from '@aws-sdk/client-s3';
+import { isProduction } from '~/constants/config';
 
 class MediaService {
   async uploadImage(req: Request) {
@@ -22,30 +23,30 @@ class MediaService {
         await sharp(file?.filepath).jpeg().toFile(newPath);
 
         // Upload img to S3
-        const s3Result = await uploadFileToS3({
-          fileName: 'images/' + newFullFileName,
-          filePath: newPath,
-          contentType: mime.getType(newPath) as string // Mime: use to return type of file base on Path such as 'image/jpeg', 'video/mp4'
-        });
+        // const s3Result = await uploadFileToS3({
+        //   fileName: 'images/' + newFullFileName,
+        //   filePath: newPath,
+        //   contentType: mime.getType(newPath) as string // Mime: use to return type of file base on Path such as 'image/jpeg', 'video/mp4'
+        // });
 
-        await Promise.all([
-          // Delete path file temp
-          fsPromise.unlink(file?.filepath),
-          // Delete path file after upload to S3
-          fsPromise.unlink(newPath)
-        ]);
-
-        return {
-          url: (s3Result as CompleteMultipartUploadCommandOutput).Location as string,
-          type: MediaType.Image
-        };
+        // await Promise.all([
+        //   // Delete path file temp
+        //   fsPromise.unlink(file?.filepath),
+        //   // Delete path file after upload to S3
+        //   fsPromise.unlink(newPath)
+        // ]);
 
         // return {
-        //   url: isProduction
-        //     ? `${process.env.HOST}/static/image/${newFullFileName}`
-        //     : `http://localhost:${process.env.PORT}/static/image/${newFullFileName}`,
+        //   url: (s3Result as CompleteMultipartUploadCommandOutput).Location as string,
         //   type: MediaType.Image
         // };
+
+        return {
+          url: isProduction
+            ? `${process.env.HOST}/static/image/${newFullFileName}`
+            : `http://localhost:${process.env.PORT}/static/image/${newFullFileName}`,
+          type: MediaType.Image
+        };
       })
     );
     return result;

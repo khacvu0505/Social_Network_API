@@ -27,8 +27,8 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import YAML from 'yaml';
 import swaggerUi from 'swagger-ui-express';
 import { envConfig, isProduction } from './constants/config';
-const fileSwagger = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
-const swaggerDocument = YAML.parse(fileSwagger);
+// const fileSwagger = fs.readFileSync(path.resolve('swagger.yaml'), 'utf8');
+// const swaggerDocument = YAML.parse(fileSwagger);
 
 const options: swaggerJSDoc.Options = {
   failOnErrors: true, // Whether or not to throw when parsing errors. Defaults to false.

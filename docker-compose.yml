@@ -1,0 +1,9 @@
+# Use this file to create Docker Container from Docker Image from name 'khacvu0505/social-network-api:v1'
+version: '3'
+services:
+  social-network-api:
+    image: khacvu0505/social-network-api:v1
+    ports:
+      - '4000:4000'
+    volumes:
+      - '~/Documents/Mine/Social-Network-API/public/uploads:/app/public/uploads'

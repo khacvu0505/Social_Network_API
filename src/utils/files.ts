@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import path from 'path';
 import formidable, { File } from 'formidable';
 import isEmpty from 'lodash/isEmpty';
-import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir';
+import { UPLOAD_IMAGE_DIR, UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir';
 import fs from 'fs';
 
 export const initFolder = () => {
@@ -14,7 +14,7 @@ export const initFolder = () => {
 };
 
 export const handleUploadImage = (req: Request) => {
-  const uploadDir = path.resolve(UPLOAD_VIDEO_DIR);
+  const uploadDir = path.resolve(UPLOAD_IMAGE_TEMP_DIR);
   const form = formidable({
     maxFiles: 4,
     maxFileSize: 300 * 1024, // 300kb =  300 * 1024
