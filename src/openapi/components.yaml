@@ -85,12 +85,33 @@ components:
           example:
             - '65bcb618f65ac613668fee62'
             - '65bcb618f65ac613668fee62'
+    UserRegisterRequestBody:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Khac Vu'
+        email:
+          type: string
+          format: email
+          example: 'khacvu0505@gmail.com'
+        password:
+          type: string
+          example: '12345678vV@'
+        confirm_password:
+          type: string
+          example: '12345678vV@'
+        date_of_birth:
+          type: string
+          format: ISO8601
+          example: '2020-06-06T08:26:05.718Z'
     UserVerifyStatus:
       type: number
       enum: [Unverify, Verified, Banned]
       example: 0
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+
+    SecuritySchemes:
+      BearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT

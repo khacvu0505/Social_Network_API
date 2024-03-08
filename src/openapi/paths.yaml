@@ -80,3 +80,26 @@ paths:
                 $ref: '#/components/schemas/User'
         '401':
           description: Not authenticated
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Đăng ký
+      description: Đăng ký tài khoản mới
+      operationId: register
+      requestBody:
+        description: Thông tin đăng ký
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/UserRegisterRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Register Successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '422':
+          description: Invalid Input
