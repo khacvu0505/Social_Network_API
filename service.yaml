@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       containers:
-        - image: asia-southeast1-a-docker.pkg.dev/h-t-d-a-f-a-t-g-c-r/custom-fastapi/custom-fastapi:latest
+        - image: asia-southeast1-a-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi:latest
           env:
           ports:
             - containerPort: 4000
