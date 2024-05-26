@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: custom-fastapi-service
+spec:
+  template:
+    spec:
+      containers:
+        - image: asia-southeast1-a-docker.pkg.dev/h-t-d-a-f-a-t-g-c-r/custom-fastapi/custom-fastapi:latest
+          env:
+          ports:
+            - containerPort: 4000
