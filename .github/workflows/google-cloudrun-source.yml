@@ -51,9 +51,9 @@ on:
     branches: [ "master" ]
 
 env:
-  PROJECT_ID: social-network-api-424501 # TODO: update Google Cloud project id
-  SERVICE: Social Network API # TODO: update Cloud Run service name
-  REGION: asia-southeast1-a # TODO: update Cloud Run service region
+  PROJECT_ID: your-project-id  # TODO: Replace with your actual Google Cloud project id
+  SERVICE: your-service-name   # TODO: Replace with your actual Cloud Run service name
+  REGION: your-region          # TODO: Replace with your actual Cloud Run service region
 
 jobs:
   deploy:
@@ -67,22 +67,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # NOTE: Alternative option - authentication via credentials json
+      # Authenticate to Google Cloud using credentials JSON
       - name: Google Auth
         id: auth
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.SA_CREDS }}'
 
+      # Deploy to Cloud Run
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          # NOTE: If required, update to the appropriate source folder
-          source: ./
+          source: ./  # Path to your source code directory
 
-      # If required, use the Cloud Run url output in later steps
+      # Show Cloud Run URL
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
