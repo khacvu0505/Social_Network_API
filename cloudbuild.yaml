@@ -6,8 +6,8 @@ steps:
         '-f',
         'Dockerfile.prod',
         '-t',
-        'us-central1-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi:latest',
+        'asia-southeast1-a-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi:latest',
         '.'
       ]
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi:latest']
+    args: ['push', 'asia-southeast1-a-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi:latest']

@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 env:
   SERVICE_NAME: social-network-api
   PROJECT_ID: social-network-api-424501
-  DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi
+  DOCKER_IMAGE_URL: asia-southeast1-a-docker.pkg.dev/social-network-api-424501/custom-fastapi/custom-fastapi
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
 
       - name: Configure Docker
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev
+          gcloud auth configure-docker asia-southeast1-a-docker.pkg.dev
 
       - name: Build and Push Docker Image
         run: |
@@ -45,5 +45,5 @@ jobs:
           gcloud run deploy $SERVICE_NAME \
             --image ${{ env.DOCKER_IMAGE_URL }}:latest \
             --platform managed \
-            --region us-east1 \
+            --region asia-southeast1-a \
             --allow-unauthenticated
